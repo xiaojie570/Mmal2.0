@@ -257,6 +257,14 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- 二期新增的 redis-->
+    <dependency>
+      <groupId>redis.clients</groupId>
+      <artifactId>jedis</artifactId>
+      <version>2.6.0</version>
+    </dependency>
+
+
   </dependencies>
 
 
