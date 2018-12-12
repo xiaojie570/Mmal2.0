@@ -8,6 +8,8 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.codehaus.jackson.type.JavaType;
+import org.codehaus.jackson.type.TypeReference;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -75,6 +77,29 @@ public class JsonUtil {
         }
     }
 
+    // 反序列化（带有泛型的）
+    public static <T> T String2Obj(String str, TypeReference typeReference) {
+        if(str.isEmpty() && typeReference == null)
+            return null;
+
+        try {
+            return typeReference.getType().equals(String.class) ? (T)(str) : (T) objectMapper.readValue(str, typeReference);
+        } catch (Exception e) {
+            log.info("Parse String to Object error",e);
+            return null;
+        }
+    }
+
+    public static <T> T String2Obj(String str,Class<?> collectionsClass, Class<?> ... elementClass ) {
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(collectionsClass,elementClass);
+        try {
+            return objectMapper.readValue(str,javaType);
+        } catch (Exception e) {
+            log.info("Parse String to Object error",e);
+            return null;
+        }
+    }
+
     public static void main(String[] args) {
         User user = new User();
         user.setId(1);
@@ -91,7 +116,8 @@ public class JsonUtil {
 
         log.info("json:{}",json);
 
-//        User user1 = JsonUtil.String2Obj(json,User.class);
+        List<User> ret = JsonUtil.String2Obj(json,List.class,User.class);
+
         System.out.println("end...");
     }
 
