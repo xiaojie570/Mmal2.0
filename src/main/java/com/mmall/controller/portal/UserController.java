@@ -1,10 +1,14 @@
 package com.mmall.controller.portal;
 
 import com.mmall.common.Const;
+import com.mmall.common.RedisPool;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
+import com.mmall.util.JsonUtil;
+import com.mmall.util.RedisPoolUtil;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +40,13 @@ public class UserController {
         ServerResponse<User> response = iUserService.login(username,password);
         // 如果返回值是正确的，则将用户信息存储在session中
         if(response.isSuccess()) {
-            session.setAttribute(Const.CURRENT_USER,response.getData());
+            //session.setAttribute(Const.CURRENT_USER,response.getData());
+            // Cookie: JSESSIONID=AF3E1E5DF03A8D1F629750BDAC5CA288
+            // A0CEAD9BE1AF0C363C9FC0AC504FCC01
+            // A0CEAD9BE1AF0C363C9FC0AC504FCC01
+            // Cookie: JSESSIONID=A0CEAD9BE1AF0C363C9FC0AC504FCC01
+            RedisPoolUtil.setEx(session.getId(), JsonUtil.obj2String(response.getData()), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
+
         }
         // 将response返回
         return response;
@@ -139,6 +149,7 @@ public class UserController {
         // 防止id变化，通过从session中获取
         user.setId(currentUser.getId());
         user.setAnswer(currentUser.getUsername());
+
         //
         ServerResponse<User> response = iUserService.updateInformation(user);
         // 如果更新成功，需要将新的用户信息存储到session中
