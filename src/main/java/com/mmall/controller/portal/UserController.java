@@ -48,6 +48,7 @@ public class UserController {
         // 如果返回值是正确的，则将用户信息存储在session中
         if(response.isSuccess()) {
             CookieUtil.writeLoginToken(httpServletResponse,session.getId());
+            CookieUtil.readLoginToken(httpServletRequest);
             //session.setAttribute(Const.CURRENT_USER,response.getData());
             // Cookie: JSESSIONID=AF3E1E5DF03A8D1F629750BDAC5CA288
             // A0CEAD9BE1AF0C363C9FC0AC504FCC01
