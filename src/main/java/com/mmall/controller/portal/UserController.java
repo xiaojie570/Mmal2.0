@@ -146,6 +146,7 @@ public class UserController {
         String userJsonStr = RedisPoolUtil.get(loginToken);
 
         User user = JsonUtil.String2Obj(userJsonStr,User.class);
+
         // 横向越权判断
         if(user == null)
             return ServerResponse.createByErrorMessage("用户未登录");
