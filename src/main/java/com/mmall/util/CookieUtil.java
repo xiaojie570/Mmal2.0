@@ -9,9 +9,15 @@ import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
 public class CookieUtil {
-    private final static String COOKIE_DOMAIN = ".tomcat.com";
+    private final static String COOKIE_DOMAIN = "nginx.tomcat.com";
     private final static String COOLIE_NAME="mmall_login_token";
 
+    //a:A.nginx.tomcat.com                   cookie:domain=A.nginx.tomcat.com; path="/"
+    //b:B.nginx.tomcat.com                   cookie:domain=B.nginx.tomcat.com; path="/"
+    //c:A.nginx.tomcat.com/test/cc           cookie:domain=A.nginx.tomcat.com; path="/test/cc"
+    //d:A.nginx.tomcat.com/test/dd           cookie:domain=A.nginx.tomcat.com; path="/test/dd"
+    //e:A.nginx.tomcat.com/test/             cookie:domain=A.nginx.tomcat.com; path="/test"
+    // c 与 d 可以共享 e的 cookie
     /**
      * 写入登录 cookie
      * @param response
@@ -20,6 +26,7 @@ public class CookieUtil {
     public static void writeLoginToken(HttpServletResponse response,String token) {
         Cookie cookie = new Cookie(COOLIE_NAME,token);
         cookie.setDomain(COOKIE_DOMAIN);
+        cookie.setHttpOnly(true); // 这么设置之后无法通过脚本来进行攻击。
         // 单位是秒，这里设置有效期为一年。
         // 如果这个MaxAge不设置的话，不会写入硬盘，而是写在内存。只在当前页面有效
         cookie.setMaxAge(60 * 60 * 24 * 365);
