@@ -27,11 +27,12 @@ public class SessionExpireFilter implements Filter{
             // 调用 logintoken是否为空或者为""
             // 如果不为空的话，符合条件，继续拿 user 信息
             String userjsonStr = RedisPoolUtil.get(loginToken);
-
-            User user = JsonUtil.String2Obj(userjsonStr,User.class);
-            if(user != null) {
-                // 如果用户不为空，则重新设置session时间
-                RedisPoolUtil.expire(loginToken, Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
+            if(StringUtils.isNotEmpty(userjsonStr)) {
+                User user = JsonUtil.String2Obj(userjsonStr, User.class);
+                if (user != null) {
+                    // 如果用户不为空，则重新设置session时间
+                    RedisPoolUtil.expire(loginToken, Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
+                }
             }
         }
         filterChain.doFilter(servletRequest,servletResponse);
